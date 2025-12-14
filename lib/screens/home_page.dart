@@ -7,6 +7,8 @@ import '../widgets/button.dart';
 import '../models/student_details.dart';
 import '../utils/storage.dart';
 import 'student_detailsUI.dart';
+import 'take_attendence.dart';
+
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -452,22 +454,62 @@ class _HomePageState extends State<HomePage> {
                   horizontal: 12,
                   vertical: 2,
                 ),
-                child: Row(
+                child: Column(
                   children: [
-                    Text(
-                      "Students in class $selectedClass",
-                      style: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                      ),
+                    Row(
+                      children: [
+                        Text(
+                          "Students in class $selectedClass",
+                          style: const TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        const Spacer(),
+                        TextButton(
+                          onPressed: () => setState(() => selectedClass = null),
+                          child: const Text(
+                            "Clear",
+                            style: TextStyle(fontWeight: FontWeight.w600),
+                          ),
+                        ),
+                      ],
                     ),
-                    const Spacer(),
-                    TextButton(
-                      onPressed: () => setState(() => selectedClass = null),
-                      child: const Text(
-                        "Clear",
-                        style: TextStyle(fontWeight: FontWeight.w600),
-                      ),
+                    const SizedBox(height: 1),
+                    CustomButton(
+                      text: "Take Attendance",
+                      color: const Color.fromARGB(255, 98, 8, 242),
+                      onPressed: () {
+                        if(selectedClass == null){
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text("Please select a class"),
+                              backgroundColor: Colors.red,
+                            )
+                          );
+                          return;
+                        }
+                        final classStudents = students.where((s) => s.studentClass == selectedClass).toList();
+                        if(classStudents.isEmpty){
+                           ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text("No students in this class"),
+                              backgroundColor: Colors.red,
+                            )
+                          );
+                          return;
+                        }
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => StudentAttendancePage(
+                              studentClass: selectedClass!,
+                              students: classStudents,
+                            ),
+                          ),
+                        );
+                      },
+                      radius: 12,
                     ),
                   ],
                 ),
